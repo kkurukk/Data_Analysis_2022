@@ -1,0 +1,48 @@
+import requests
+import lxml.html
+import sqlite3
+from pandas.io import sql
+import os
+import re
+import string
+import pandas as pd
+from tabulate import tabulate
+from selenium.webdriver import Chrome
+import time
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+from selenium import webdriver
+from selenium.webdriver import ActionChains
+
+
+
+
+def get_urls():
+    url_list = []
+    
+    response = requests.get('https://world.moleg.go.kr/web/dta/lgslTrendListPage.do')
+    root = lxml.html.fromstring(response.content)
+    for tr in root.xpath('//*[@id="contents"]/table/tbody/tr') :
+        a = tr.xpath('td[3]/a')[0]
+        url = 'https://world.moleg.go.kr' + a.get('href')
+        url_list.append(url)
+    
+    return url_list
+    
+ 
+ 
+ 
+browser = webdriver.Chrome('C:/Users/user/.wdm/drivers/chromedriver/win32/105.0.5195/chromedriver.exe')
+
+urls = get_urls()
+
+for url in urls:
+    browser.get(url)
+    trs = browser.find_element('xpath','//*[@id="lgslTrend_CTS"]').text
+    browser.implicitly_wait(4)
+    print(trs)
+    
+    print('\n-------------------------------------------------')
+
+browser.implicitly_wait(4)
+browser.close()
